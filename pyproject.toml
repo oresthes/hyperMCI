@@ -1,0 +1,28 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "hyperMCI"
+version = "0.1.0"
+description = "A small package for calculating confidence intervals for the success parameter of a hypergeometric distribution."
+authors = ["Orest Alickolli <oalickolli@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+keywords = ["math", "statistics", "hypergeometric"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+packages = [{include = "hyperMCI"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+numpy = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+black = "^23.0.0"
+build = "^0.10.0"
+
