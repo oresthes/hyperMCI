@@ -49,16 +49,6 @@ A Python package for calculating optimal confidence intervals for the hypergeome
 
 hyperMCI implements the optimal confidence interval calculation methods described by Bartroff et al. (2022) in their paper "Optimal and fast confidence intervals for hypergeometric successes". This package provides efficient algorithms for computing confidence intervals with guaranteed coverage probability for the hypergeometric distribution.
 
-## Installation
-
-```bash
-# Install using pip
-pip install hyperMCI
-
-# Or using Poetry
-poetry add hyperMCI
-```
-
 ## Usage
 
 ```python
