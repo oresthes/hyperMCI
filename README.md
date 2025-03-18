@@ -20,6 +20,7 @@ pip install git+https://gitlab.com/mintel/dsa/tools/cpg/hypermci.git
 poetry add hyperMCI 
 # or
 poetry add git+https://gitlab.com/mintel/dsa/tools/cpg/hypermci.git
+````
 
 ## Usage
 
@@ -28,9 +29,10 @@ from hyperMCI import CI_interval
 
 # Calculate 95% confidence interval
 # Parameters: (observed successes, sample size, population size, significance level)
-lower, upper = CI_interval(x=3, n=10, N=100, alpha=0.05)
+lower, upper = get_success_confidence_interval(x=3, n=10, N=100, alpha=0.05)
 print(f"95% Confidence interval: [{lower}, {upper}]")
-````
+```
+
 
 ## Features
 
@@ -48,17 +50,6 @@ A Python package for calculating optimal confidence intervals for the hypergeome
 ## Description
 
 hyperMCI implements the optimal confidence interval calculation methods described by Bartroff et al. (2022) in their paper "Optimal and fast confidence intervals for hypergeometric successes". This package provides efficient algorithms for computing confidence intervals with guaranteed coverage probability for the hypergeometric distribution.
-
-## Usage
-
-```python
-from hyperMCI import CI_interval
-
-# Calculate 95% confidence interval
-# Parameters: (observed successes, sample size, population size, significance level)
-lower, upper = get_success_confidence_interval(x=3, n=10, N=100, alpha=0.05)
-print(f"95% Confidence interval: [{lower}, {upper}]")
-```
 
 ## Mathematical Background
 
