@@ -40,16 +40,6 @@ print(f"95% Confidence interval: [{lower}, {upper}]")
 - Implementation of the Alpha-Max-Optimal (AMO) approach for optimal acceptance intervals
 - Efficient calculation of hypergeometric probability mass functions
 
-## Mathematical Background
-
-````markdown
-# hyperMCI
-
-A Python package for calculating optimal confidence intervals for the hypergeometric distribution success parameter.
-
-## Description
-
-hyperMCI implements the optimal confidence interval calculation methods described by Bartroff et al. (2022) in their paper "Optimal and fast confidence intervals for hypergeometric successes". This package provides efficient algorithms for computing confidence intervals with guaranteed coverage probability for the hypergeometric distribution.
 
 ## Mathematical Background
 
@@ -69,15 +59,3 @@ Bartroff, J., et al. (2022). Optimal and fast confidence intervals for hypergeom
 
 MIT
 
-```
-
-## Citation
-
-If you use this package in your research, please cite:
-
-Bartroff, J., Lorden, G., & Wang, L. (2022). Optimal and Fast Confidence Intervals for Hypergeometric Successes. The American Statistician, 77(2), 151–159. https://doi.org/10.1080/00031305.2022.2128421
-
-## License
-
-MIT
-```
