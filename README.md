@@ -8,19 +8,6 @@ hyperMCI implements the optimal confidence interval calculation methods describe
 
 ## Installation
 
-````bash
-# Install using pip
-# if available in Pypi or private repository
-pip install hyperMCI
-# or
-pip install git+https://gitlab.com/mintel/dsa/tools/cpg/hypermci.git
-
-# Or using Poetry
-# if available in Pypi or private repository
-poetry add hyperMCI 
-# or
-poetry add git+https://gitlab.com/mintel/dsa/tools/cpg/hypermci.git
-````
 
 ## Usage
 
