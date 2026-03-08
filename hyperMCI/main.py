@@ -1,49 +1,58 @@
+from __future__ import annotations
+
 import math
+from typing import Union
 
 import numpy as np
 
 from .hypergeom_dist import hypergeom_pmf_factory
 
 
-def _get_alpha_max_optimal_acceptance_intervals(n, N, alpha=0.05):
-    """Calculate the confidence interval for a hypergeometric distribution.
-
-    This function computes the confidence interval of number of "successes" M
-    using the hypergeometric distribution given the population size,
-    sample size, and significance level.
+def _validate_params(n: int, N: int, alpha: float) -> None:
+    """Validate parameters shared across all public functions.
 
     Args:
-        n (int): The sample size. Must be a non-negative integer less than or
-            equal to N.
-        N (int): The size of the population. Must be a positive integer.
-        alpha (float): Corresponds to 1 - alpha significance level.
-            Must be between 0 and 1 (exclusive).
-            A 95% confidence level is the default value.
-
-    Returns:
-        tuple: A tuple containing the lower and upper bounds of the confidence
-        interval.
+        n: The sample size.
+        N: The population size.
+        alpha: The significance level.
 
     Raises:
-        ValueError: If n is not a non-negative integer less than or equal to N.
         ValueError: If N is not a positive integer.
+        ValueError: If n is not a non-negative integer less than or equal to N.
         ValueError: If alpha is not in the interval (0, 1).
     """
-    if not (isinstance(n, int) and 0 <= n <= N):
-        raise ValueError(
-            "n must be a non-negative integer less than or equal to N.")
     if not (isinstance(N, int) and N > 0):
         raise ValueError("N must be a natural number (a positive integer).")
+    if not (isinstance(n, int) and 0 <= n <= N):
+        raise ValueError(
+            "n must be a non-negative integer less than or equal to N."
+        )
     if not (0 < alpha < 1):
         raise ValueError("alpha must be between 0 and 1 (exclusive).")
 
+
+def _get_alpha_max_optimal_acceptance_intervals(
+    n: int, N: int, alpha: float = 0.05
+) -> tuple[np.ndarray, np.ndarray]:
+    """Compute the AMO acceptance intervals for a hypergeometric distribution.
+
+    This private helper computes the Alpha-Max-Optimal (AMO) acceptance
+    intervals for the number of successes M. Parameters are assumed to have
+    been validated by the caller.
+
+    Args:
+        n: The sample size (non-negative integer, n <= N).
+        N: The size of the population (positive integer).
+        alpha: The significance level in (0, 1). Defaults to 0.05.
+
+    Returns:
+        A tuple (a, b) of numpy arrays of length N+1 where a[M] and b[M]
+        are the lower and upper acceptance interval bounds for each M.
+    """
     a = np.zeros(N + 1)
     b = np.zeros(N + 1)
 
-    # Loop over M values
     for M in range(0, math.floor(N / 2) + 1):
-
-        # Calculate initial boundaries
         C = D = math.floor(((n + 1) * (M + 1)) / (N + 2))
 
         PM = hypergeom_pmf_factory(M, n, N)
@@ -70,38 +79,43 @@ def _get_alpha_max_optimal_acceptance_intervals(n, N, alpha=0.05):
     return a, b
 
 
-def get_enhanced_acceptance_intervals(n, N, alpha):
-    """Calculate the confidence interval for a hypergeometric distribution.
+def get_enhanced_acceptance_intervals(
+    n: int, N: int, alpha: float
+) -> tuple[np.ndarray, np.ndarray]:
+    """Calculate the enhanced AMO acceptance intervals for a hypergeometric
+    distribution.
 
-    This function computes the confidence interval of number of "successes" M
-    using the hypergeometric distribution given the population size,
-    sample size, and significance level.
+    This function computes the enhanced Alpha-Max-Optimal (AMO) acceptance
+    intervals for the number of successes M using the hypergeometric
+    distribution, given the population size, sample size, and significance
+    level. The enhancement enforces monotonicity of acceptance region
+    boundaries, which is required for valid confidence interval inversion.
 
     Args:
-        n (int): The sample size. Must be a non-negative integer less than or
+        n (int): The sample size. Must be a non-negative integer less than
+            or equal to N.
         N (int): The size of the population. Must be a positive integer.
-        equal to N.
-        alpha (float): Corresponds to 1 - alpha significance level.
-            Must be between 0 and 1 (exclusive).
+        alpha (float): The significance level. Corresponds to a
+            (1 - alpha) confidence level. Must be between 0 and 1
+            (exclusive). For a 95% confidence interval use alpha=0.05.
 
     Returns:
-        tuple: A tuple containing the lower and upper bounds of the confidence
-        interval.
+        tuple[np.ndarray, np.ndarray]: A tuple (a_star, b_star) of numpy
+            arrays of length N+1, where a_star[M] and b_star[M] are the
+            lower and upper bounds of the enhanced AMO acceptance interval
+            for each M.
 
     Raises:
-        ValueError: If n is not a non-negative integer less than or equal to N.
         ValueError: If N is not a positive integer.
+        ValueError: If n is not a non-negative integer less than or equal to N.
         ValueError: If alpha is not in the interval (0, 1).
-    """
-    if not (isinstance(n, int) and 0 <= n <= N):
-        raise ValueError(
-            "n must be a non-negative integer less than or equal to N.")
-    if not (isinstance(N, int) and N > 0):
-        raise ValueError("N must be a natural number (a positive integer).")
-    if not (0 < alpha < 1):
-        raise ValueError("alpha must be between 0 and 1 (exclusive).")
 
-    # Declare a_star and b_start as numpy arrays of length N+1
+    Example:
+        >>> a_star, b_star = get_enhanced_acceptance_intervals(n=10, N=100, alpha=0.05)
+        >>> # a_star[M] and b_star[M] give the acceptance bounds for each M
+    """
+    _validate_params(n, N, alpha)
+
     a_star = np.zeros(N + 1)
     b_star = np.zeros(N + 1)
 
@@ -134,75 +148,92 @@ def get_enhanced_acceptance_intervals(n, N, alpha):
     return a_star, b_star
 
 
-def get_success_confidence_interval(x, n, N, alpha):
-    """Calculate the confidence interval for the success variable M in a
+def get_success_confidence_interval(
+    x: Union[int, list[int], np.ndarray],
+    n: int,
+    N: int,
+    alpha: float,
+) -> Union[tuple[int, int], tuple[np.ndarray, np.ndarray]]:
+    """Calculate the confidence interval for the success count M in a
     hypergeometric distribution.
 
+    Given x observed successes in a sample of size n drawn without
+    replacement from a population of N, this function returns the
+    (1 - alpha) confidence interval for the unknown total number of
+    successes M in the population.
+
     Args:
-        x (int or array-like): Observed number of successes. Can be an
-        integer between 0 and n inclusive or an array of such integers.
+        x (int or array-like): Observed number of successes in the sample.
+            Must be an integer between 0 and n inclusive, or an array of
+            such integers.
         n (int): The sample size. Must be a non-negative integer less than
-        or equal to N.
+            or equal to N.
         N (int): The size of the population. Must be a positive integer.
-        alpha (float): Corresponds to 1 - alpha significance level.
-            Must be between 0 and 1 (exclusive).
+        alpha (float): The significance level. Must be between 0 and 1
+            (exclusive). For a 95% confidence interval use alpha=0.05.
 
     Returns:
-            If x is a single integer: A tuple (Lx, Ux) containing the lower
-            and upper confidence interval bounds.
-            If x is an array: A tuple (Lx_array, Ux_array) containing arrays
-            of lower and upper confidence interval bounds for each element in
-            x.
+        If x is a single integer: a tuple (Lx, Ux) of ints representing
+            the lower and upper confidence bounds for M.
+        If x is array-like: a tuple (Lx_array, Ux_array) of numpy arrays
+            containing the lower and upper confidence bounds for each
+            element of x.
+
+    Raises:
+        ValueError: If N is not a positive integer.
+        ValueError: If n is not a non-negative integer less than or equal
+            to N.
+        ValueError: If alpha is not in the interval (0, 1).
+        ValueError: If x (or any element of x) is not between 0 and n.
+
+    Example:
+        >>> lower, upper = get_success_confidence_interval(x=3, n=10, N=100, alpha=0.05)
+        >>> print(f"95% CI for M: [{lower}, {upper}]")
+        95% CI for M: [6, 57]
     """
+    _validate_params(n, N, alpha)
 
-    # Check if N is a positive integer
-    if not (isinstance(N, int) and N > 0):
-        raise ValueError("N must be a positive integer.")
-    # Check if n is a non-negative integer less than or equal to N
-    if not (isinstance(n, int) and 0 <= n <= N):
-        raise ValueError(
-            "n must be a non-negative integer less than or equal to N.")
-    # Check if alpha is in the interval (0, 1)
-    if not (0 < alpha < 1):
-        raise ValueError("alpha must be between 0 and 1 (exclusive).")
-
-    # Get amo intervals
     a_star, b_star = get_enhanced_acceptance_intervals(n, N, alpha)
 
-    # Check if x is a single integer or an array
-    is_array = hasattr(x, '__iter__') and not isinstance(x, (str, bytes))
+    is_array = hasattr(x, "__iter__") and not isinstance(x, (str, bytes))
 
     if is_array:
-        # Convert x to numpy array if it's not already
         x_array = np.array(x, dtype=int)
 
-        # Check if all elements of x are integers between 0 and n inclusive
         if not np.all((x_array >= 0) & (x_array <= n)):
             raise ValueError(
-                "All elements of x must be integers between 0 "
-                "and n inclusive."
+                "All elements of x must be integers between 0 and n inclusive."
             )
 
-        # Initialize arrays for lower and upper confidence interval bounds
         Lx_array = np.zeros_like(x_array)
         Ux_array = np.zeros_like(x_array)
 
-        # Calculate confidence intervals for each element in x
         for i, xi in enumerate(x_array):
             S = [M for M in range(N + 1) if a_star[M] <= xi <= b_star[M]]
+            if not S:
+                raise ValueError(
+                    f"No valid M found for observed x={xi}. "
+                    "This indicates a bug — please open an issue at "
+                    "https://github.com/oresthes/hyperMCI/issues."
+                )
             Lx_array[i] = min(S)
             Ux_array[i] = max(S)
 
         return Lx_array, Ux_array
+
     else:
-        # Check if x is an integer between 0 and n inclusive
         if not (isinstance(x, int) and 0 <= x <= n):
             raise ValueError(
-                "x must be an integer between 0 "
-                "and n inclusive.")
+                "x must be an integer between 0 and n inclusive."
+            )
 
-        # Invert acceptance intervals for single integer x
         S = [M for M in range(N + 1) if a_star[M] <= x <= b_star[M]]
+        if not S:
+            raise ValueError(
+                f"No valid M found for observed x={x}. "
+                "This indicates a bug — please open an issue at "
+                "https://github.com/oresthes/hyperMCI/issues."
+            )
         Lx = min(S)
         Ux = max(S)
 

@@ -5,24 +5,81 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "hyperMCI"
 version = "0.1.0"
-description = "A small package for calculating confidence intervals for the success parameter of a hypergeometric distribution."
+description = "Optimal confidence intervals for the hypergeometric distribution success parameter using the Alpha-Max-Optimal (AMO) method."
 authors = ["Orest Alickolli <oalickolli@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-keywords = ["math", "statistics", "hypergeometric"]
+homepage = "https://github.com/oresthes/hyperMCI"
+repository = "https://github.com/oresthes/hyperMCI"
+documentation = "https://github.com/oresthes/hyperMCI#readme"
+keywords = ["math", "statistics", "hypergeometric", "confidence-interval", "sampling"]
 classifiers = [
-    "Programming Language :: Python :: 3",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Typing :: Typed",
 ]
 packages = [{include = "hyperMCI"}]
+include = ["hyperMCI/py.typed"]
 
 [tool.poetry.dependencies]
 python = ">=3.8"
-numpy = "^1.0.0"
+numpy = ">=1.20.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"
-black = "^23.0.0"
-build = "^0.10.0"
+pytest-cov = "^4.0.0"
+black = "^24.0.0"
+ruff = "^0.3.0"
+mypy = "^1.9.0"
+build = "^1.0.0"
+pre-commit = "^3.7.0"
 
+# ---------------------------------------------------------------------------
+# Tool configuration
+# ---------------------------------------------------------------------------
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--tb=short"
+
+[tool.coverage.run]
+source = ["hyperMCI"]
+omit = ["tests/*", "examples/*"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 70
+
+[tool.black]
+line-length = 88
+target-version = ["py38", "py39", "py310", "py311", "py312"]
+
+[tool.ruff]
+target-version = "py38"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+strict_optional = true
