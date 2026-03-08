@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from typing import Union
 
 import numpy as np
 
@@ -24,9 +23,7 @@ def _validate_params(n: int, N: int, alpha: float) -> None:
     if not (isinstance(N, int) and N > 0):
         raise ValueError("N must be a natural number (a positive integer).")
     if not (isinstance(n, int) and 0 <= n <= N):
-        raise ValueError(
-            "n must be a non-negative integer less than or equal to N."
-        )
+        raise ValueError("n must be a non-negative integer less than or equal to N.")
     if not (0 < alpha < 1):
         raise ValueError("alpha must be between 0 and 1 (exclusive).")
 
@@ -149,11 +146,11 @@ def get_enhanced_acceptance_intervals(
 
 
 def get_success_confidence_interval(
-    x: Union[int, list[int], np.ndarray],
+    x: int | list[int] | np.ndarray,
     n: int,
     N: int,
     alpha: float,
-) -> Union[tuple[int, int], tuple[np.ndarray, np.ndarray]]:
+) -> tuple[int, int] | tuple[np.ndarray, np.ndarray]:
     """Calculate the confidence interval for the success count M in a
     hypergeometric distribution.
 
@@ -223,9 +220,7 @@ def get_success_confidence_interval(
 
     else:
         if not (isinstance(x, int) and 0 <= x <= n):
-            raise ValueError(
-                "x must be an integer between 0 and n inclusive."
-            )
+            raise ValueError("x must be an integer between 0 and n inclusive.")
 
         S = [M for M in range(N + 1) if a_star[M] <= x <= b_star[M]]
         if not S:

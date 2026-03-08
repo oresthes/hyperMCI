@@ -74,10 +74,16 @@ line-length = 88
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "C4"]
-ignore = ["E501"]
+# N803/N806: uppercase argument/variable names are mathematical convention (M, N, C, D, …)
+# N999: package name hyperMCI is intentionally camelCase
+ignore = ["E501", "N803", "N806", "N999"]
+
+[tool.ruff.lint.per-file-ignores]
+# Test functions reference parameter names M and N in their identifiers (e.g. test_invalid_N)
+"tests/*" = ["N802"]
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

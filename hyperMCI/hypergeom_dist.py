@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import math
 from functools import partial
+from typing import Callable
 
 
 def _hypergeom_pmf_with_range(
@@ -13,7 +16,7 @@ def _hypergeom_pmf_with_range(
     return (math.comb(M, x) * math.comb(N - M, n - x)) / math.comb(N, n)
 
 
-def hypergeom_pmf_factory(M: int, n: int, N: int):
+def hypergeom_pmf_factory(M: int, n: int, N: int) -> Callable[[int], float]:
     """Create a partial function for Hypergeometric PMF with fixed (M, N, n).
 
     The valid range for x is:
@@ -39,10 +42,4 @@ def hypergeom_pmf_factory(M: int, n: int, N: int):
     x_max = min(M, n)
 
     # Return a partial function that only needs `x`
-    return partial(
-        _hypergeom_pmf_with_range,
-        M=M,
-        n=n,
-        N=N,
-        x_min=x_min,
-        x_max=x_max)
+    return partial(_hypergeom_pmf_with_range, M=M, n=n, N=N, x_min=x_min, x_max=x_max)
